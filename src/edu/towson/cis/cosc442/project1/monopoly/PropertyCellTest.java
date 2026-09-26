@@ -31,4 +31,16 @@ public class PropertyCellTest extends TestCase {
 				1380 + cell.getRent(),
 				gameMaster.getPlayer(0).getMoney());
 	}
+
+	public void testMonopolyDoublesBaseRent() {
+		gameMaster.setNumberOfPlayers(1);
+		Player player = gameMaster.getPlayer(0);
+		GameBoard board = gameMaster.getGameBoard();
+		player.buyProperty(board.queryCell("Blue 1"), 0);
+		player.buyProperty(board.queryCell("Blue 2"), 0);
+		player.buyProperty(board.queryCell("Blue 3"), 0);
+
+		PropertyCell property = (PropertyCell) board.queryCell("Blue 1");
+		assertEquals(20, property.getRent());
+	}
 }
