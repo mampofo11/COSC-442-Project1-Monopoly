@@ -3,8 +3,17 @@ package edu.towson.cis.cosc442.project1.monopoly.gui;
 import edu.towson.cis.cosc442.project1.monopoly.*;
 import javax.swing.JOptionPane;
 
+/**
+ * Starts the Monopoly graphical application and initializes its game state.
+ */
 public class Main {
 
+	/**
+	 * Prompts until a valid number of players is supplied.
+	 *
+	 * @param window parent window for the input dialogs
+	 * @return the accepted player count
+	 */
 	private static int inputNumberOfPlayers(MainWindow window) {
 		int numPlayers = 0;
 		while(numPlayers <= 0 || numPlayers > GameMaster.MAX_PLAYER) {
@@ -12,11 +21,7 @@ public class Main {
 			if(numberOfPlayers == null) {
 				System.exit(0);
 			}
-			try {
-				numPlayers = Integer.parseInt(numberOfPlayers);
-			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(window, "Please input a number");
-			}
+			numPlayers = parseNumberOfPlayers(window, numberOfPlayers);
 			if (numPlayers <= 0 || numPlayers > GameMaster.MAX_PLAYER) {
 				JOptionPane.showMessageDialog(window, "Please input a number between one and eight");
 			} else {
@@ -26,6 +31,27 @@ public class Main {
 		return numPlayers;
 	}
 
+	/**
+	 * Parses a player-count response and reports nonnumeric input.
+	 *
+	 * @param window parent window for the error dialog
+	 * @param input text entered by the user
+	 * @return the parsed count, or zero when the input is not numeric
+	 */
+	private static int parseNumberOfPlayers(MainWindow window, String input) {
+		try {
+			return Integer.parseInt(input);
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(window, "Please input a number");
+			return 0;
+		}
+	}
+
+	/**
+	 * Initializes the board, players, and Swing game window.
+	 *
+	 * @param args optional test mode and game-board class arguments
+	 */
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
 		GameMaster master = GameMaster.instance();

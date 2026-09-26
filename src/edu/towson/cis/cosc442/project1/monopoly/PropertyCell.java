@@ -42,7 +42,8 @@ public class PropertyCell extends Cell {
 	 *
 	 * @return the property price
 	 */
-    public int getPrice() {
+	@Override
+	public int getPrice() {
 		return sellPrice;
 	}
 
@@ -63,8 +64,8 @@ public class PropertyCell extends Cell {
 	private int calculateMonopoliesRent() {
 		int rentToCharge = rent;
 		String [] monopolies = theOwner.getMonopolies();
-		for(int i = 0; i < monopolies.length; i++) {
-			if(monopolies[i].equals(colorGroup)) {
+		for(String monopoly : monopolies) {
+			if(monopoly.equals(colorGroup)) {
 				rentToCharge = rent * 2;
 			}
 		}
@@ -74,10 +75,10 @@ public class PropertyCell extends Cell {
 	/**
 	 * Applies rent when another player lands on this owned property.
 	 */
+	@Override
 	public void playAction() {
-		Player currentPlayer = null;
 		if(!isAvailable()) {
-			currentPlayer = GameMaster.instance().getCurrentPlayer();
+			Player currentPlayer = GameMaster.instance().getCurrentPlayer();
 			if(theOwner != currentPlayer) {
 				currentPlayer.payRentTo(theOwner, getRent());
 			}

@@ -84,7 +84,8 @@ public abstract class Cell {
      *
      * @return the cell name
      */
-    public String toString() {
+	@Override
+	public String toString() {
         return name;
     }
 }
