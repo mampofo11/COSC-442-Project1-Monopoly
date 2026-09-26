@@ -56,7 +56,7 @@ public class Main {
 	public static void main(String[] args) {
 		GameMaster master = GameMaster.instance();
 		MainWindow window = new MainWindow();
-		GameBoard gameBoard = null;
+		GameBoard gameBoard;
 		if(args.length > 0) {
 			if(args[0].equals("test")) {
 				master.setTestMode(true);
@@ -68,31 +68,22 @@ public class Main {
 			catch (ClassNotFoundException e) {
 				JOptionPane.showMessageDialog(window, "Class Not Found.  Program will exit");
 				System.exit(0);
+				return;
 			}
 			catch (IllegalAccessException e ) {
 				JOptionPane.showMessageDialog(window, "Illegal Access of Class.  Program will exit");
 				System.exit(0);
+				return;
 			}
 			catch (InstantiationException e) {
 				JOptionPane.showMessageDialog(window, "Class Cannot be Instantiated.  Program will exit");
 				System.exit(0);
+				return;
 			}
 		}
 		else {
 			gameBoard = new GameBoardFull();
 		}
-		
-//      GameBoard gameBoard = new GameBoardFull();
-//		GameBoard gameBoard = new GameBoardCCMovePlayer();
-//		GameBoard gameBoard = new GameBoardCCLoseMoney();
-//		GameBoard gameBoard = new GameBoardCCJail();
-//		GameBoard gameBoard = new GameBoardUtility();
-//		GameBoard gameBoard = new GameBoardRailRoad();
-//		GameBoard gameBoard = new GameBoard14();
-//		GameBoard gameBoard = new SimpleGameBoard();
-//		GameBoard gameBoard = new GameBoardJail();
-//		GameBoard gameBoard = new GameBoardFreeParking();
-
 		master.setGameBoard(gameBoard);
 		int numPlayers = inputNumberOfPlayers(window);
 		for(int i = 0; i < numPlayers; i++) {
