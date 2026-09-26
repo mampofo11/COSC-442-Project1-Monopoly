@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 
+/**
+ * Coordinates Monopoly game state, player turns, board actions, and GUI updates.
+ */
 public class GameMaster {
 
 	private static GameMaster gameMaster;
@@ -17,6 +20,11 @@ public class GameMaster {
 	private int utilDiceRoll;
 	private boolean testMode;
 
+	/**
+	 * Returns the shared game controller instance.
+	 *
+	 * @return the game controller
+	 */
 	public static GameMaster instance() {
 		if(gameMaster == null) {
 			gameMaster = new GameMaster();
@@ -24,16 +32,24 @@ public class GameMaster {
 		return gameMaster;
 	}
 
+	/**
+	 * Creates a controller with the standard starting balance and dice.
+	 */
 	public GameMaster() {
 		initAmountOfMoney = 1500;
 		dice = new Die[]{new Die(), new Die()};
 	}
 
-    public void btnBuyHouseClicked() {
+	/** Opens the house-purchase dialog for the current player. */
+	public void btnBuyHouseClicked() {
         gui.showBuyHouseDialog(getCurrentPlayer());
     }
 
-    public Card btnDrawCardClicked() {
+	/** Draws and applies the card at the current player's position.
+	 *
+	 * @return the card drawn
+	 */
+	public Card btnDrawCardClicked() {
         gui.setDrawCardEnabled(false);
         CardCell cell = (CardCell)getCurrentPlayer().getPosition();
         Card card = null;
@@ -48,7 +64,8 @@ public class GameMaster {
         return card;
     }
 
-    public void btnEndTurnClicked() {
+	/** Resolves the current cell action and advances the turn when possible. */
+	public void btnEndTurnClicked() {
 		setAllButtonEnabled(false);
 		getCurrentPlayer().getPosition().playAction();
 		if(getCurrentPlayer().isBankrupt()) {
@@ -67,7 +84,8 @@ public class GameMaster {
 		}
     }
 
-    public void btnGetOutOfJailClicked() {
+	/** Pays bail for the current player and updates the available actions. */
+	public void btnGetOutOfJailClicked() {
 		getCurrentPlayer().getOutOfJail();
 		if(getCurrentPlayer().isBankrupt()) {
 			gui.setBuyHouseEnabled(false);
@@ -85,14 +103,16 @@ public class GameMaster {
 		}
     }
 
-    public void btnPurchasePropertyClicked() {
+	/** Purchases the current cell for the active player when available. */
+	public void btnPurchasePropertyClicked() {
         Player player = getCurrentPlayer();
 		player.purchase();
 		gui.setPurchasePropertyEnabled(false);
 		updateGUI();
     }
     
-    public void btnRollDiceClicked() {
+	/** Rolls the dice and moves the current player by the resulting total. */
+	public void btnRollDiceClicked() {
 		int[] rolls = rollDice();
 		if((rolls[0]+rolls[1]) > 0) {
 			Player player = getCurrentPlayer();
@@ -109,7 +129,8 @@ public class GameMaster {
 		}
     }
 
-    public void btnTradeClicked() {
+	/** Opens the trade workflow and completes an accepted trade. */
+	public void btnTradeClicked() {
         TradeDialog dialog = gui.openTradeDialog();
         TradeDeal deal = dialog.getTradeDeal();
         if(deal != null) {
@@ -121,7 +142,12 @@ public class GameMaster {
         }
     }
 
-    public void completeTrade(TradeDeal deal) {
+	/**
+	 * Transfers the offered property and payment for an accepted deal.
+	 *
+	 * @param deal the accepted trade terms
+	 */
+	public void completeTrade(TradeDeal deal) {
         Player seller = getPlayer(deal.getPlayerIndex());
         Cell property = gameBoard.queryCell(deal.getPropertyName());
         seller.sellProperty(property, deal.getAmount());
@@ -137,19 +163,27 @@ public class GameMaster {
     }
 
 	
+	/**
+	 * Returns the player whose turn is active.
+	 *
+	 * @return the current player
+	 */
 	public Player getCurrentPlayer() {
 		return getPlayer(turn);
 	}
     
-    public int getCurrentPlayerIndex() {
+	/** @return the active player's index */
+	public int getCurrentPlayerIndex() {
         return turn;
     }
 
+	/** @return the board used by the current game */
 	public GameBoard getGameBoard() {
 		return gameBoard;
 	}
 
-    public MonopolyGUI getGUI() {
+	/** @return the GUI connected to this game */
+	public MonopolyGUI getGUI() {
         return gui;
     }
 
@@ -157,6 +191,7 @@ public class GameMaster {
 		return initAmountOfMoney;
 	}
 	
+	/** @return the number of players in the game */
 	public int getNumberOfPlayers() {
 		return players.size();
 	}
@@ -165,6 +200,12 @@ public class GameMaster {
         return players.size() - 1;
     }
 
+	/**
+	 * Returns the player at the specified index.
+	 *
+	 * @param index the zero-based player index
+	 * @return the requested player
+	 */
 	public Player getPlayer(int index) {
 		return (Player)players.get(index);
 	}
@@ -182,6 +223,7 @@ public class GameMaster {
         return sellers;
     }
 
+	/** @return the current turn index */
 	public int getTurn() {
 		return turn;
 	}
@@ -190,11 +232,23 @@ public class GameMaster {
 		return this.utilDiceRoll;
 	}
 
+	/**
+	 * Moves the indexed player by the specified number of spaces.
+	 *
+	 * @param playerIndex the zero-based player index
+	 * @param diceValue the number of spaces to move
+	 */
 	public void movePlayer(int playerIndex, int diceValue) {
 		Player player = (Player)players.get(playerIndex);
 		movePlayer(player, diceValue);
 	}
 	
+	/**
+	 * Moves a player, awards passing-Go money, and updates the game display.
+	 *
+	 * @param player the player to move
+	 * @param diceValue the number of spaces to move
+	 */
 	public void movePlayer(Player player, int diceValue) {
 		Cell currentPosition = player.getPosition();
 		int positionIndex = gameBoard.queryCellIndex(currentPosition.getName());
@@ -208,6 +262,11 @@ public class GameMaster {
 		updateGUI();
 	}
 
+	/**
+	 * Enables actions appropriate to the cell where a player landed.
+	 *
+	 * @param player the player who moved
+	 */
 	public void playerMoved(Player player) {
 		Cell cell = player.getPosition();
 		int playerIndex = getPlayerIndex(player);
@@ -225,6 +284,7 @@ public class GameMaster {
         gui.setTradeEnabled(turn, false);
 	}
 
+	/** Resets player positions, card state, and the active turn. */
 	public void reset() {
 		for(int i = 0; i < getNumberOfPlayers(); i++){
 			Player player = (Player)players.get(i);
@@ -234,6 +294,11 @@ public class GameMaster {
 		turn = 0;
 	}
 	
+	/**
+	 * Rolls both dice, or retrieves configured test rolls in test mode.
+	 *
+	 * @return the two dice results
+	 */
 	public int[] rollDice() {
 		if(testMode) {
 			return gui.getDiceRoll();
@@ -246,6 +311,11 @@ public class GameMaster {
 		}
 	}
 	
+	/**
+	 * Moves the specified player to Jail and marks them as jailed.
+	 *
+	 * @param player the player to send to Jail
+	 */
 	public void sendToJail(Player player) {
 	    int oldPosition = gameBoard.queryCellIndex(getCurrentPlayer().getPosition().getName());
 		player.setPosition(gameBoard.queryCell("Jail"));
@@ -267,10 +337,20 @@ public class GameMaster {
         gui.setGetOutOfJailEnabled(enabled);
 	}
 
+	/**
+	 * Sets the board used by this game.
+	 *
+	 * @param board the game board
+	 */
 	public void setGameBoard(GameBoard board) {
 		this.gameBoard = board;
 	}
 	
+	/**
+	 * Connects the GUI that receives game updates.
+	 *
+	 * @param gui the game interface
+	 */
 	public void setGUI(MonopolyGUI gui) {
 		this.gui = gui;
 	}
@@ -279,6 +359,11 @@ public class GameMaster {
 		this.initAmountOfMoney = money;
 	}
 
+	/**
+	 * Creates the requested number of players with the starting balance.
+	 *
+	 * @param number the number of players
+	 */
 	public void setNumberOfPlayers(int number) {
 		players.clear();
 		for(int i =0;i<number;i++) {
@@ -292,12 +377,14 @@ public class GameMaster {
 		this.utilDiceRoll = diceRoll;
 	}
 	
+	/** Starts the game and enables the first player's turn. */
 	public void startGame() {
 		gui.startGame();
 		gui.enablePlayerTurn(0);
         gui.setTradeEnabled(0, true);
 	}
 
+	/** Advances to the next player and refreshes turn-specific controls. */
 	public void switchTurn() {
 		turn = (turn + 1) % getNumberOfPlayers();
 		if(!getCurrentPlayer().isInJail()) {
@@ -310,14 +397,21 @@ public class GameMaster {
 		}
 	}
 	
+	/** Refreshes the connected game interface from current state. */
 	public void updateGUI() {
 		gui.update();
 	}
 
+	/** Requests and stores the utility-rent dice roll from the GUI. */
 	public void utilRollDice() {
 		this.utilDiceRoll = gui.showUtilDiceRoll();
 	}
 
+	/**
+	 * Enables or disables deterministic dice behavior for tests.
+	 *
+	 * @param b {@code true} to use test-mode dice rolls
+	 */
 	public void setTestMode(boolean b) {
 		testMode = b;
 	}
